@@ -17,6 +17,7 @@ class AuthenticationBloc
     on<_LogOut>(_onLogOut);
   }
 
+  // ignore: unused_field
   final AuthApiClient _authApiClient;
 
   Future<void> _onLogOut(
