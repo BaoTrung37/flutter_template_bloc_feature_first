@@ -1,15 +1,15 @@
 import 'package:dio/dio.dart';
-import 'package:example_flutter_app/core/app_config.dart';
 import 'package:example_flutter_app/core/infrastructure/core/interceptors/curl_logger_dio_interceptor.dart';
+import 'package:example_flutter_app/core/infrastructure/environment/env_keys.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 abstract class DioHelper {
   // @factoryMethod
-  static Dio configApiDio(AppConfig appConfig) => _createDio(
+  static Dio configApiDio() => _createDio(
         options: BaseOptions(
           connectTimeout: const Duration(seconds: 10),
           receiveTimeout: const Duration(seconds: 10),
-          baseUrl: appConfig.envKeys.baseUrl,
+          baseUrl: EnvKeys.baseUrl,
         ),
         interceptors: [
           //

@@ -15,13 +15,10 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AppConfig {
-  late Flavor flavor;
-  late EnvKeys envKeys;
   Future<void> initialize() async {
-    flavor = flavorEnum;
+    await _initEnvKeys();
     await Future.wait([
       _initDependencies(),
-      _initEnvKeys(),
       _initFirebase(),
       _initBloc(),
       _initHydratedBloc(),
@@ -46,8 +43,7 @@ class AppConfig {
   }
 
   Future<void> _initEnvKeys() async {
-    envKeys = EnvKeys();
-    await envKeys.loadEnv(flavor);
+    await EnvKeys.loadEnv();
   }
 
   Future<void> _initBloc() async {
@@ -63,12 +59,12 @@ class AppConfig {
   }
 
   Future<void> _initDependencies() async {
-    await configureDependencies(this);
+    await configureDependencies();
     await getIt.allReady();
   }
 
   String get title {
-    switch (flavor) {
+    switch (flavorEnum) {
       case Flavor.dev:
         return 'Bt App Dev';
       case Flavor.prod:
@@ -77,7 +73,7 @@ class AppConfig {
   }
 
   FirebaseOptions get firebaseOptions {
-    switch (flavor) {
+    switch (flavorEnum) {
       case Flavor.dev:
         return dev.DefaultFirebaseOptions.currentPlatform;
       case Flavor.prod:
