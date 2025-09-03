@@ -1,9 +1,26 @@
+ifeq ($(OS),Windows_NT)
+	COPY = copy
+else 
+	COPY = cp
+endif
+
 first_run:
-	fvm use 3.27.2
-	make create-env-files
+	fvm use 3.35.2
+	make create-env-filesmake 
 	make get-dep
 	make build-runner-delete
 	make gen-l10n
+
+rebuild:
+	make clean
+	make get-dep
+	make build-runner-delete
+	make gen-l10n
+	
+create-env-files:
+	@echo "Using $(COPY) command..."
+	@$(COPY) assets/env/.env.example assets/env/.env
+	@$(COPY) assets/env/.env.example assets/env/.env.dev
 
 clean:
 	fvm flutter clean
@@ -27,7 +44,7 @@ watch-runner-delete:
 	fvm flutter pub run build_runner watch --delete-conflicting-outputs
 
 gen-l10n:
-	fvm flutter gen-l10n --no-nullable-getter   
+	fvm flutter gen-l10n
 
 gen-flavor:
 	fvm flutter pub run flutter_flavorizr
@@ -50,12 +67,4 @@ build-ipa-dev:
 build-ipa-prod:
 	fvm flutter build ipa --flavor prod -t lib/main.dart --dart-define=FLAVOR=prod
 
-create-env-files:
-	cp assets/env/.env.example assets/env/.env
-	cp assets/env/.env.example assets/env/.env.dev
 
-rebuild:
-	make clean
-	make get-dependencies
-	make build-runner-delete
-	make gen-l10n
