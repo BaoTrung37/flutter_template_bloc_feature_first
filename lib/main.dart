@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:catcher_2/catcher_2.dart';
-import 'package:example_flutter_app/core/application/auth/authentication_bloc.dart';
 import 'package:example_flutter_app/core/application/language/language_bloc.dart';
 import 'package:example_flutter_app/core/config.dart';
 import 'package:example_flutter_app/core/injection/injection.dart';
@@ -32,8 +31,7 @@ Future<void> main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   HttpOverrides.global = MyHttpOverrides();
 
-  final appConfig = AppConfig();
-  await appConfig.initialize();
+  await AppConfig.configure();
 
   final debugOptions = Catcher2Options(SilentReportMode(), [
     ToastHandler(
@@ -75,11 +73,7 @@ class MyApp extends StatelessWidget {
         child: child,
       ),
       child: MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthenticationBloc>(
-            create: (context) => getIt<AuthenticationBloc>(),
-          ),
-        ],
+        providers: const [],
         child: ThemeProvider(
           notifier: AppTheme.uniform(
             themeFactory: const UniversalThemeFactory(),

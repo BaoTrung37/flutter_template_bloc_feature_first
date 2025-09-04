@@ -30,7 +30,6 @@ enum ErrorCode {
   tooManyRequests, // Error when too many requests have been made
   expiredActionCode, // Error when the action code has expired
   invalidActionCode, // Error when the action code is invalid
-
   // Store Errors
   storeProblemError, // Error when there is a store problem
   productAlreadyPurchasedError, // Error when a product is already purchased
@@ -60,7 +59,6 @@ enum ErrorCode {
   beginRefundRequestError, // Error when beginning a refund request
   apiEndpointBlocked, // Error when the API endpoint is blocked
   invalidPromotionalOfferError, // Error when the promotional offer is invalid
-
   // General Errors
   unknown, // Represents an unknown error
   cancelled, // Represents a cancelled operation
@@ -73,12 +71,10 @@ enum ErrorCode {
 @freezed
 abstract class ServerError with _$ServerError {
   const factory ServerError({
-    @JsonKey(name: 'error_code', defaultValue: ErrorCode.unknown)
-    @Default(ErrorCode.unknown)
-    ErrorCode errorCode,
-    @JsonKey(name: 'developer_text') String? developerText,
-    @JsonKey(name: 'display_message') String? displayMessage,
-    @JsonKey(name: 'message') String? message,
+    @Default(ErrorCode.unknown) ErrorCode errorCode,
+    String? developerText,
+    String? displayMessage,
+    String? message,
   }) = _ServerError;
   factory ServerError.fromJson(Map<String, dynamic> json) =>
       _$ServerErrorFromJson(json);

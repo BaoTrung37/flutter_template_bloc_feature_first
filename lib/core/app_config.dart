@@ -15,7 +15,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AppConfig {
-  Future<void> initialize() async {
+  static Future<void> configure() async {
     await _initEnvKeys();
     await Future.wait([
       _initDependencies(),
@@ -25,12 +25,13 @@ class AppConfig {
     ]);
   }
 
-  Future<void> _initFirebase() async {
+  static Future<void> _initFirebase() async {
     await Firebase.initializeApp(options: firebaseOptions);
     await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     await FirebaseAppCheck.instance.activate(
-      androidProvider:
-          kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+      androidProvider: kDebugMode
+          ? AndroidProvider.debug
+          : AndroidProvider.playIntegrity,
       appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.appAttest,
     );
     await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
@@ -42,15 +43,15 @@ class AppConfig {
     };
   }
 
-  Future<void> _initEnvKeys() async {
+  static Future<void> _initEnvKeys() async {
     await EnvKeys.loadEnv();
   }
 
-  Future<void> _initBloc() async {
+  static Future<void> _initBloc() async {
     Bloc.observer = SimpleBlocObserver();
   }
 
-  Future<void> _initHydratedBloc() async {
+  static Future<void> _initHydratedBloc() async {
     HydratedBloc.storage = await HydratedStorage.build(
       storageDirectory: kIsWeb
           ? HydratedStorageDirectory.web
@@ -58,12 +59,12 @@ class AppConfig {
     );
   }
 
-  Future<void> _initDependencies() async {
+  static Future<void> _initDependencies() async {
     await configureDependencies();
     await getIt.allReady();
   }
 
-  String get title {
+  static String get title {
     switch (flavorEnum) {
       case Flavor.dev:
         return 'Bt App Dev';
@@ -72,7 +73,7 @@ class AppConfig {
     }
   }
 
-  FirebaseOptions get firebaseOptions {
+  static FirebaseOptions get firebaseOptions {
     switch (flavorEnum) {
       case Flavor.dev:
         return dev.DefaultFirebaseOptions.currentPlatform;
@@ -82,10 +83,7 @@ class AppConfig {
   }
 }
 
-enum Flavor {
-  dev,
-  prod;
-}
+enum Flavor { dev, prod }
 
 const flavor = String.fromEnvironment('FLAVOR');
 Flavor get flavorEnum => flavor == 'prod' ? Flavor.prod : Flavor.dev;
