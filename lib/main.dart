@@ -50,29 +50,19 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
   ]).then((_) {
     Catcher2(
-      rootWidget: const App(),
+      rootWidget: const MyApp(),
       debugConfig: debugOptions,
       releaseConfig: releaseOptions,
     );
   });
 
-  runApp(const App());
+  runApp(const MyApp());
 
   FlutterNativeSplash.remove();
 }
 
-class App extends StatefulWidget {
-  const App({super.key});
-
-  @override
-  State<App> createState() => _AppState();
-}
-
-class _AppState extends State<App> {
-  @override
-  void dispose() {
-    super.dispose();
-  }
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -84,50 +74,41 @@ class _AppState extends State<App> {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: child,
       ),
-      child: const MyApp(),
-    );
-  }
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<AuthenticationBloc>(
-          create: (context) => getIt<AuthenticationBloc>(),
-        ),
-      ],
-      child: ThemeProvider(
-        notifier: AppTheme.uniform(
-          themeFactory: const UniversalThemeFactory(),
-          lightColors: NikeColors.light(),
-          darkColors: NikeColors.dark(),
-          defaultMode: ThemeMode.light,
-          textTheme: NikeTextTheme.build(),
-        ),
-        child: BlocBuilder<LanguageBloc, LanguageState>(
-          bloc: getIt<LanguageBloc>(),
-          builder: (context, state) {
-            return MaterialApp.router(
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              theme: ThemeProvider.of(context).light,
-              darkTheme: ThemeProvider.of(context).dark,
-              themeMode: ThemeProvider.of(context).mode,
-              supportedLocales: AppLocalizations.supportedLocales,
-              locale: state.language.locale,
-              // routerConfig: getIt<AppRouter>().config(),
-              routerDelegate: getIt<AppRouter>().delegate(),
-              routeInformationParser: getIt<AppRouter>().defaultRouteParser(),
-            );
-          },
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthenticationBloc>(
+            create: (context) => getIt<AuthenticationBloc>(),
+          ),
+        ],
+        child: ThemeProvider(
+          notifier: AppTheme.uniform(
+            themeFactory: const UniversalThemeFactory(),
+            lightColors: NikeColors.light(),
+            darkColors: NikeColors.dark(),
+            defaultMode: ThemeMode.light,
+            textTheme: NikeTextTheme.build(),
+          ),
+          child: BlocBuilder<LanguageBloc, LanguageState>(
+            bloc: getIt<LanguageBloc>(),
+            builder: (context, state) {
+              return MaterialApp.router(
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                theme: ThemeProvider.of(context).light,
+                darkTheme: ThemeProvider.of(context).dark,
+                themeMode: ThemeProvider.of(context).mode,
+                supportedLocales: AppLocalizations.supportedLocales,
+                locale: state.language.locale,
+                // routerConfig: getIt<AppRouter>().config(),
+                routerDelegate: getIt<AppRouter>().delegate(),
+                routeInformationParser: getIt<AppRouter>().defaultRouteParser(),
+              );
+            },
+          ),
         ),
       ),
     );
