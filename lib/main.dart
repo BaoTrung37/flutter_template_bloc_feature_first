@@ -44,17 +44,14 @@ Future<void> main() async {
   final releaseOptions = Catcher2Options(SilentReportMode(), [
     // CrashlyticsHandler(),
   ]);
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]).then((_) {
-    Catcher2(
-      rootWidget: const MyApp(),
-      debugConfig: debugOptions,
-      releaseConfig: releaseOptions,
-    );
-  });
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  runApp(const MyApp());
+  Catcher2(
+    rootWidget: const MyApp(),
+    debugConfig: debugOptions,
+    releaseConfig: releaseOptions,
+    navigatorKey: navigatorGlobalKey,
+  );
 
   FlutterNativeSplash.remove();
 }
@@ -69,40 +66,37 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) => GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        onTap: () => FocusScope.of(context).unfocus(),
         child: child,
       ),
-      child: MultiBlocProvider(
-        providers: const [],
-        child: ThemeProvider(
-          notifier: AppTheme.uniform(
-            themeFactory: const UniversalThemeFactory(),
-            lightColors: NikeColors.light(),
-            darkColors: NikeColors.dark(),
-            defaultMode: ThemeMode.light,
-            textTheme: NikeTextTheme.build(),
-          ),
-          child: BlocBuilder<LanguageBloc, LanguageState>(
-            bloc: getIt<LanguageBloc>(),
-            builder: (context, state) {
-              return MaterialApp.router(
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                theme: ThemeProvider.of(context).light,
-                darkTheme: ThemeProvider.of(context).dark,
-                themeMode: ThemeProvider.of(context).mode,
-                supportedLocales: AppLocalizations.supportedLocales,
-                locale: state.language.locale,
-                // routerConfig: getIt<AppRouter>().config(),
-                routerDelegate: getIt<AppRouter>().delegate(),
-                routeInformationParser: getIt<AppRouter>().defaultRouteParser(),
-              );
-            },
-          ),
+      child: ThemeProvider(
+        notifier: AppTheme.uniform(
+          themeFactory: const UniversalThemeFactory(),
+          lightColors: NikeColors.light(),
+          darkColors: NikeColors.dark(),
+          defaultMode: ThemeMode.light,
+          textTheme: NikeTextTheme.build(),
+        ),
+        child: BlocBuilder<LanguageBloc, LanguageState>(
+          bloc: getIt<LanguageBloc>(),
+          builder: (context, state) {
+            return MaterialApp.router(
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              theme: ThemeProvider.of(context).light,
+              darkTheme: ThemeProvider.of(context).dark,
+              themeMode: ThemeProvider.of(context).mode,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: state.language.locale,
+              // routerConfig: getIt<AppRouter>().config(),
+              routerDelegate: getIt<AppRouter>().delegate(),
+              routeInformationParser: getIt<AppRouter>().defaultRouteParser(),
+            );
+          },
         ),
       ),
     );

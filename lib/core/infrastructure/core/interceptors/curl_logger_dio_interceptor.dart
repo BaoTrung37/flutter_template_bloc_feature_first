@@ -22,11 +22,8 @@ class CurlLoggerDioInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(
-    Response response,
-    ResponseInterceptorHandler handler,
-  ) {
-    if (printOnSuccess != null || printOnSuccess!) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    if (printOnSuccess == true) {
       log(_cURLRepresentation(response.requestOptions));
     }
     return handler.next(response); //continue
@@ -37,12 +34,14 @@ class CurlLoggerDioInterceptor extends Interceptor {
     try {
       log(_cURLRepresentation(requestOptions));
     } catch (err) {
-      log('unable to create a CURL representation of the requestOptions: ${err.toString()}');
+      log(
+        'unable to create a CURL representation of the requestOptions: ${err.toString()}',
+      );
       if (kDebugMode) {
-        print('CURL representation error details: $err');
-        print('RequestOptions: ${requestOptions.toString()}');
+        debugPrint('CURL representation error details: $err');
+        debugPrint('RequestOptions: ${requestOptions.toString()}');
         if (requestOptions.data != null) {
-          print('Request data type: ${requestOptions.data.runtimeType}');
+          debugPrint('Request data type: ${requestOptions.data.runtimeType}');
         }
       }
     }

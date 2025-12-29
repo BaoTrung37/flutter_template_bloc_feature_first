@@ -28,12 +28,7 @@ class AppConfig {
   static Future<void> _initFirebase() async {
     await Firebase.initializeApp(options: firebaseOptions);
     await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
-    await FirebaseAppCheck.instance.activate(
-      androidProvider: kDebugMode
-          ? AndroidProvider.debug
-          : AndroidProvider.playIntegrity,
-      appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.appAttest,
-    );
+    await FirebaseAppCheck.instance.activate();
     await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
@@ -67,9 +62,9 @@ class AppConfig {
   static String get title {
     switch (flavorEnum) {
       case Flavor.dev:
-        return 'Bt App Dev';
+        return 'LoyalT Dev';
       case Flavor.prod:
-        return 'Bt App';
+        return 'LoyalT';
     }
   }
 
