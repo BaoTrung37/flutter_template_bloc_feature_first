@@ -1,5 +1,5 @@
 # Template Flutter Project                   
-Flutter SDK = 3.27.2                         
+Flutter SDK = 3.35.2                         
 # Set up for Development   
 
 ### Git clone app
@@ -10,7 +10,7 @@ make first_run
 ```
 otherwise
 ```sh
-fvm use 3.27.2 
+fvm use 3.35.2 
 cp ./assets/env/.env.example ./assets/env/.env
 cp ./assets/env/.env.example ./assets/env/.env.dev
 fvm flutter pub get     

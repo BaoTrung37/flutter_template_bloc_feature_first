@@ -6,7 +6,7 @@ endif
 
 first_run:
 	fvm use 3.35.2
-	make create-env-filesmake 
+	make create-env-files
 	make get-dep
 	make build-runner-delete
 	make gen-l10n
