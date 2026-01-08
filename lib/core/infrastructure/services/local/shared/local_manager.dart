@@ -10,10 +10,7 @@ class SharedManager {
 
   ///* First Launch
   Future<void> saveFirstLaunch() async {
-    await _sharedPreferences.setBool(
-      SharedKeys.firstLaunch.name,
-      false,
-    );
+    await _sharedPreferences.setBool(SharedKeys.firstLaunch.name, false);
   }
 
   bool getFirstLaunch() {
@@ -31,7 +28,6 @@ class SecureManager {
     iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
     aOptions: AndroidOptions(
       storageCipherAlgorithm: StorageCipherAlgorithm.AES_CBC_PKCS7Padding,
-      encryptedSharedPreferences: true,
     ),
   );
 

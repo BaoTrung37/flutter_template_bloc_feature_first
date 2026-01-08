@@ -4,7 +4,7 @@ else
 	COPY = cp
 endif
 
-first_run:
+first-run:
 	fvm use 3.35.2
 	make create-env-files
 	make get-dep
