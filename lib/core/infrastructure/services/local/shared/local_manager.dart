@@ -1,4 +1,4 @@
-import 'package:example_flutter_app/core/config.dart';
+import 'package:example_flutter_app/core/infrastructure/services/local/shared/local_keys.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';

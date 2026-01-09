@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:example_flutter_app/core/config.dart';
+import 'package:example_flutter_app/core/infrastructure/network/network.dart';
 import 'package:example_flutter_app/core/infrastructure/environment/env_keys.dart';
 import 'package:example_flutter_app/core/injection/injection.dart';
 import 'package:injectable/injectable.dart';

@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:catcher_2/catcher_2.dart';
-import 'package:example_flutter_app/core/application/language/language_bloc.dart';
-import 'package:example_flutter_app/core/config.dart';
+import 'package:example_flutter_app/features/language/application/bloc/language_bloc.dart';
+import 'package:example_flutter_app/core/app_config.dart';
 import 'package:example_flutter_app/core/injection/injection.dart';
 import 'package:example_flutter_app/core/theme/colors.dart';
 import 'package:example_flutter_app/core/theme/providers/theme_provider.dart';
