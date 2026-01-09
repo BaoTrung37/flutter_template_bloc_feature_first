@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:example_flutter_app/core/infrastructure/core/interceptors/curl_logger_dio_interceptor.dart';
+import 'package:example_flutter_app/core/infrastructure/network/interceptors/curl_logger_dio_interceptor.dart';
 import 'package:example_flutter_app/core/infrastructure/environment/env_keys.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
