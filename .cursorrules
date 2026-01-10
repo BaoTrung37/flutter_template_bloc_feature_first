@@ -1,0 +1,93 @@
+
+You are an expert Flutter developer. You are developing a Flutter application using Clean Architecture with BLoC, Freezed, Injectable, and AutoRoute.
+
+## Project Structure
+
+The project follows a Clean Architecture structure:
+- `lib/core`: Contains core utilities, base classes, and configurations (router, injection, theme, etc.).
+- `lib/features`: Contains feature-specific code, organized by feature name.
+  - `domain`: Entities, failures, and repository interfaces.
+  - `infrastructure`: Repository implementations, DTOs, and data sources.
+  - `application`: Business logic (BLoC/Cubit) - *Note: Project seems to group bloc in features under `bloc` directory directly sometimes based on `create_session` example, but typically application layer contains blocs*.
+  - `presentation`: UI widgets and pages.
+- `lib/gen`: Generated code (assets, localization).
+
+## Key Libraries & Patterns
+
+- **State Management**: `flutter_bloc`. Use `Bloc` for complex state and `Cubit` for simpler state.
+- **Dependency Injection**: `injectable` and `get_it`. Use `@injectable`, `@singleton`, `@lazySingleton` annotations.
+- **Routing**: `auto_route`. Use `@RoutePage`, `AutoRouterConfig`, `RootStackRouter`, `AutoRouteWrapper`.
+- **Data Classes**: `freezed` and `json_serializable`. Use `@freezed` for unions/sealed classes and `@JsonSerializable` for DTOs.
+- **Network**: `dio` (inferred) with `retrofit` (likely, given `g.dart` files and clean arch).
+- **Localization**: `flutter_localizations` (implied by `AppLocalizations`).
+- **Screen Adaptation**: `flutter_screenutil`. Use `.w`, `.h`, `.sp`, `.r` extensions for responsive design.
+
+## WORKFLOW
+1. Khi tôi yêu cầu tạo một tính năng mới, hãy tạo cấu trúc thư mục đầy đủ 3 lớp trước.
+2. Viết Entity ở lớp Domain đầu tiên.
+3. Viết Repository Interface và UseCase.
+4. Viết Model và DataSource ở lớp Data.
+5. Cuối cùng mới viết BLoC và UI ở lớp Presentation.
+
+### General
+- Use `final` variables wherever possible.
+- Use `const` constructors for widgets.
+- Prefer named parameters for widget constructors.
+- Class names should be PascalCase.
+- File names should be snake_case.
+
+### BLoC Pattern
+- Segregate BLoC events, states, and the BLoC class itself into separate files or a single file if small.
+- Use `RestState` (from `core/domain/state/rest_state.dart`) for handling async data states (loading, success, error) generic types.
+- Events should be Unions (Freezed).
+- States should be Unions (Freezed) or simple classes with `copyWith`.
+
+### Dependency Injection
+- Register repositories as abstractions in `domain` and implementations in `infrastructure`.
+- Use `getIt<T>()` for resolving dependencies in non-widget classes or creating BlocProviders.
+- Use `@injectable` for automatic registration.
+
+### Router
+- annotated pages with `@RoutePage()`.
+- Implement `AutoRouteWrapper` if the page needs to provide a BLoC or specific context.
+- Register routes in `AppRouter` (`lib/core/router/app_router.dart`).
+
+### UI & Theming
+- Use `ScreenUtil` for sizing.
+- Access theme via `Theme.of(context)` or custom `ThemeProvider`.
+- Use `StatelessWidget` when possible.
+
+### Example: BLoC
+```dart
+@injectable
+class MyBloc extends Bloc<MyEvent, MyState> {
+  MyBloc(this._repo) : super(MyState.initial()) {
+    on<_Started>(_onStarted);
+  }
+  final MyRepo _repo;
+  // ...
+}
+```
+
+### Example: Page with BlocProvider
+```dart
+@RoutePage()
+class MyPage extends StatelessWidget implements AutoRouteWrapper {
+  const MyPage({super.key});
+
+  @override
+  Widget wrappedRoute(BuildContext context) {
+    return BlocProvider(
+      create: (_) => getIt<MyBloc>()..add(const MyEvent.started()),
+      child: this,
+    );
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // ...
+    );
+  }
+}
+```

@@ -2,13 +2,15 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:catcher_2/catcher_2.dart';
-import 'package:example_flutter_app/core/application/language/language_bloc.dart';
-import 'package:example_flutter_app/core/config.dart';
+import 'package:example_flutter_app/core/app_config.dart';
 import 'package:example_flutter_app/core/injection/injection.dart';
+import 'package:example_flutter_app/core/router/app_router.dart';
+import 'package:example_flutter_app/core/shared/languages.dart';
 import 'package:example_flutter_app/core/theme/colors.dart';
 import 'package:example_flutter_app/core/theme/providers/theme_provider.dart';
 import 'package:example_flutter_app/core/theme/texts.dart';
 import 'package:example_flutter_app/core/theme/universal_theme.dart';
+import 'package:example_flutter_app/features/language/application/bloc/language_bloc.dart';
 import 'package:example_flutter_app/gen/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

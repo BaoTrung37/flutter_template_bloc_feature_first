@@ -1,27 +1,17 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:example_flutter_app/core/infrastructure/core/core.dart';
+import 'package:example_flutter_app/core/presentation/extensions/buildcontext_extension.dart';
 import 'package:example_flutter_app/features/main_page/application/bottom_tab_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MainBottomBar extends StatelessWidget {
-  const MainBottomBar({
-    required this.bottomTabCubit,
-    super.key,
-  });
+  const MainBottomBar({required this.bottomTabCubit, super.key});
   final BottomTabCubit bottomTabCubit;
   @override
   Widget build(BuildContext context) {
-    final tabs = <TabItem>[
-      TabItem(
-        text: 'Home',
-      ),
-      TabItem(
-        text: 'Profile',
-      ),
-    ];
+    final tabs = <TabItem>[TabItem(text: 'Home'), TabItem(text: 'Profile')];
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -56,10 +46,7 @@ class MainBottomBar extends StatelessWidget {
 }
 
 class _TabBarItem extends StatelessWidget {
-  const _TabBarItem({
-    required this.tabItem,
-    this.isSelected = false,
-  });
+  const _TabBarItem({required this.tabItem, this.isSelected = false});
   final bool isSelected;
   final TabItem tabItem;
   @override
@@ -99,9 +86,7 @@ class _TabBarItem extends StatelessWidget {
 }
 
 class TabItem {
-  TabItem({
-    required this.text,
-  });
+  TabItem({required this.text});
 
   final String text;
 }

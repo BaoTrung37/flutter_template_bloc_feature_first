@@ -11,6 +11,7 @@ part 'app_router.gr.dart';
 @AutoRouterConfig()
 @lazySingleton
 class AppRouter extends RootStackRouter {
+  AppRouter() : super(navigatorKey: navigatorGlobalKey);
   @override
   List<AutoRoute> get routes => [
     AutoRoute(
@@ -23,7 +24,6 @@ class AppRouter extends RootStackRouter {
         AutoRoute(path: 'profile-page', page: ProfileRoute.page),
       ],
     ),
-    AutoRoute(path: '/setting-page', page: SettingRoute.page),
   ];
 }
 
