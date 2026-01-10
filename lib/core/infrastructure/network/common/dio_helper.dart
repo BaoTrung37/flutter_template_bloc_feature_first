@@ -1,21 +1,21 @@
 import 'package:dio/dio.dart';
-import 'package:example_flutter_app/core/infrastructure/network/interceptors/curl_logger_dio_interceptor.dart';
 import 'package:example_flutter_app/core/infrastructure/environment/env_keys.dart';
+import 'package:example_flutter_app/core/infrastructure/network/interceptors/curl_logger_dio_interceptor.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 abstract class DioHelper {
   // @factoryMethod
   static Dio configApiDio() => _createDio(
-        options: BaseOptions(
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
-          baseUrl: EnvKeys.baseUrl,
-        ),
-        interceptors: [
-          //
-        ],
-        loggerEnable: true,
-      );
+    options: BaseOptions(
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      baseUrl: EnvKeys.baseUrl,
+    ),
+    interceptors: [
+      //
+    ],
+    loggerEnable: true,
+  );
 
   static Dio _createDio({
     required BaseOptions options,
@@ -26,9 +26,7 @@ abstract class DioHelper {
     dio.options = options;
 
     if (interceptors != null) {
-      dio.interceptors.addAll(
-        [...interceptors],
-      );
+      dio.interceptors.addAll([...interceptors]);
     }
 
     if (loggerEnable) {
@@ -41,13 +39,13 @@ abstract class DioHelper {
 
 class _DebugLogger extends PrettyDioLogger {
   _DebugLogger()
-      : super(
-          requestHeader: true,
-          requestBody: true,
-          responseBody: true,
-          responseHeader: true,
-          error: true,
-          compact: true,
-          maxWidth: 1000,
-        );
+    : super(
+        requestHeader: true,
+        requestBody: true,
+        responseBody: true,
+        responseHeader: true,
+        error: true,
+        compact: true,
+        maxWidth: 1000,
+      );
 }
