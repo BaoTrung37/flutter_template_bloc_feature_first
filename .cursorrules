@@ -12,7 +12,12 @@ The project follows a Clean Architecture structure:
   - `presentation`: UI widgets and pages.
 - `lib/gen`: Generated code (assets, localization).
 
-## Key Libraries & Patterns
+## Coding Styles
+- If a widget present in two places, it should be moved to `core/presentation/widgets`.
+- If file lines go over 100, it should be separated into multiple files.
+- Logic should be separated from UI.
+
+## Key Libraries & Patterns 
 
 - **State Management**: `flutter_bloc`. Use `Bloc` for complex state and `Cubit` for simpler state.
 - **Dependency Injection**: `injectable` and `get_it`. Use `@injectable`, `@singleton`, `@lazySingleton` annotations.
@@ -22,12 +27,7 @@ The project follows a Clean Architecture structure:
 - **Localization**: `flutter_localizations` (implied by `AppLocalizations`).
 - **Screen Adaptation**: `flutter_screenutil`. Use `.w`, `.h`, `.sp`, `.r` extensions for responsive design.
 
-## WORKFLOW
-1. Khi tôi yêu cầu tạo một tính năng mới, hãy tạo cấu trúc thư mục đầy đủ 3 lớp trước.
-2. Viết Entity ở lớp Domain đầu tiên.
-3. Viết Repository Interface và UseCase.
-4. Viết Model và DataSource ở lớp Data.
-5. Cuối cùng mới viết BLoC và UI ở lớp Presentation.
+## Coding Standards
 
 ### General
 - Use `final` variables wherever possible.
