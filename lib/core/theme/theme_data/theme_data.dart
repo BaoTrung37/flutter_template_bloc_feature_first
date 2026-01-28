@@ -1,5 +1,5 @@
-import 'package:example_flutter_app/core/theme/colors.dart';
-import 'package:example_flutter_app/core/theme/texts.dart';
+import 'package:example_flutter_app/app/theme/app_colors.dart';
+import 'package:example_flutter_app/app/theme/app_text_theme.dart';
 import 'package:flutter/material.dart';
 
 /// The first problem of Material theme is that you don't build it from a predefined set of colors
@@ -19,13 +19,13 @@ import 'package:flutter/material.dart';
 /// | surface     | #EDEAE5     | #0A0A0A    |
 /// | onSurface   | #FFFFFF     | #161616    |
 /// | error       | #E3442F     | #E3442F    |
-class NikeThemeData {
-  const NikeThemeData({
+class AppThemeData {
+  const AppThemeData({
     required this.colors,
     required this.defaultTextTheme,
     required this.materialTheme,
   });
-  final NikeColors colors;
-  final NikeTextTheme defaultTextTheme;
+  final AppColors colors;
+  final AppTextTheme defaultTextTheme;
   final ThemeData materialTheme;
 }

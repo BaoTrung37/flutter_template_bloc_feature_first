@@ -1,20 +1,20 @@
-import 'package:example_flutter_app/core/theme/colors.dart';
-import 'package:example_flutter_app/core/theme/texts.dart';
+import 'package:example_flutter_app/app/theme/app_colors.dart';
+import 'package:example_flutter_app/app/theme/app_text_theme.dart';
 import 'package:example_flutter_app/core/theme/theme_data/theme_data.dart';
 import 'package:example_flutter_app/core/theme/theme_data/theme_data_factory.dart';
 import 'package:flutter/material.dart';
 
 /// This is a uniform theme
 /// But you can use it to create multiple themes for iOS, Android, Web, Desktop...
-class UniversalThemeFactory extends NikeThemeDataFactory {
-  const UniversalThemeFactory();
+class DefaultThemeFactory extends AppThemeDataFactory {
+  const DefaultThemeFactory();
 
   @override
-  NikeThemeData build({
-    required NikeColors colors,
-    required NikeTextTheme defaultTextStyle,
+  AppThemeData build({
+    required AppColors colors,
+    required AppTextTheme defaultTextStyle,
   }) {
-    return NikeThemeData(
+    return AppThemeData(
       colors: colors,
       defaultTextTheme: defaultTextStyle,
       materialTheme: ThemeData(
@@ -69,8 +69,8 @@ class UniversalThemeFactory extends NikeThemeDataFactory {
   }
 
   NavigationRailThemeData navigationRailThemeData({
-    required NikeColors colors,
-    required NikeTextTheme textTheme,
+    required AppColors colors,
+    required AppTextTheme textTheme,
   }) =>
       NavigationRailThemeData(
         backgroundColor: colors.white,
@@ -90,8 +90,8 @@ class UniversalThemeFactory extends NikeThemeDataFactory {
       );
 
   ElevatedButtonThemeData elevatedButtonTheme({
-    required NikeColors colors,
-    required NikeTextTheme textTheme,
+    required AppColors colors,
+    required AppTextTheme textTheme,
   }) =>
       ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -111,8 +111,8 @@ class UniversalThemeFactory extends NikeThemeDataFactory {
       );
 
   OutlinedButtonThemeData outlinedButtonTheme({
-    required NikeColors colors,
-    required NikeTextTheme textTheme,
+    required AppColors colors,
+    required AppTextTheme textTheme,
   }) =>
       OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -133,8 +133,8 @@ class UniversalThemeFactory extends NikeThemeDataFactory {
       );
 
   InputDecorationTheme inputDecorationTheme({
-    required NikeColors colors,
-    required NikeTextTheme textTheme,
+    required AppColors colors,
+    required AppTextTheme textTheme,
   }) =>
       InputDecorationTheme(
         fillColor: colors.white,
@@ -173,8 +173,8 @@ class UniversalThemeFactory extends NikeThemeDataFactory {
       );
 
   TextTheme textTheme({
-    required NikeColors colors,
-    required NikeTextTheme defaultTextStyle,
+    required AppColors colors,
+    required AppTextTheme defaultTextStyle,
   }) =>
       TextTheme(
         headlineLarge: defaultTextStyle.bold30.copyWith(

@@ -1,46 +1,46 @@
 import 'dart:io';
 
-import 'package:example_flutter_app/core/theme/colors.dart';
-import 'package:example_flutter_app/core/theme/texts.dart';
+import 'package:example_flutter_app/app/theme/app_colors.dart';
+import 'package:example_flutter_app/app/theme/app_text_theme.dart';
 import 'package:example_flutter_app/core/theme/theme_data/theme_data.dart';
 
-sealed class NikeTheme {
-  const NikeTheme();
+sealed class AppBaseTheme {
+  const AppBaseTheme();
 
-  NikeColors get colors;
+  AppColors get colors;
 
-  NikeTextTheme get textTheme;
+  AppTextTheme get textTheme;
 
-  NikeThemeData get data;
+  AppThemeData get data;
 }
 
-class NikeThemeUniform extends NikeTheme {
-  const NikeThemeUniform(this.data);
+class AppBaseThemeUniform extends AppBaseTheme {
+  const AppBaseThemeUniform(this.data);
 
   @override
-  final NikeThemeData data;
+  final AppThemeData data;
 
   @override
-  NikeColors get colors => data.colors;
+  AppColors get colors => data.colors;
 
   @override
-  NikeTextTheme get textTheme => data.defaultTextTheme;
+  AppTextTheme get textTheme => data.defaultTextTheme;
 }
 
 /// If you want to have different
 /// themes for different platforms
-class NikeThemeAdaptive extends NikeTheme {
-  const NikeThemeAdaptive({
+class AppBaseThemeAdaptive extends AppBaseTheme {
+  const AppBaseThemeAdaptive({
     this.ios,
     this.android,
     this.web,
   });
-  final NikeThemeData? ios;
-  final NikeThemeData? android;
-  final NikeThemeData? web;
+  final AppThemeData? ios;
+  final AppThemeData? android;
+  final AppThemeData? web;
 
   @override
-  NikeColors get colors {
+  AppColors get colors {
     if (Platform.isIOS) {
       return ios!.colors;
     } else if (Platform.isAndroid) {
@@ -51,7 +51,7 @@ class NikeThemeAdaptive extends NikeTheme {
   }
 
   @override
-  NikeTextTheme get textTheme {
+  AppTextTheme get textTheme {
     if (Platform.isIOS) {
       return ios!.defaultTextTheme;
     } else if (Platform.isAndroid) {
@@ -62,7 +62,7 @@ class NikeThemeAdaptive extends NikeTheme {
   }
 
   @override
-  NikeThemeData get data {
+  AppThemeData get data {
     if (Platform.isIOS) {
       return ios!;
     } else if (Platform.isAndroid) {

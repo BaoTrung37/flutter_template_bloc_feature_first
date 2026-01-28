@@ -1,22 +1,29 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:example_flutter_app/core/infrastructure/bloc_observer/bloc_observer.dart';
-import 'package:example_flutter_app/core/infrastructure/environment/env_keys.dart';
-import 'package:example_flutter_app/core/infrastructure/firebase/firebase_options_dev.dart'
+import 'package:example_flutter_app/app/config/firebase/firebase_options_dev.dart'
     as dev;
-import 'package:example_flutter_app/core/infrastructure/firebase/firebase_options_prod.dart'
+import 'package:example_flutter_app/app/config/firebase/firebase_options_prod.dart'
     as prod;
+import 'package:example_flutter_app/core/config/core_config.dart';
+import 'package:example_flutter_app/core/infrastructure/bloc_observer/bloc_observer.dart';
 import 'package:example_flutter_app/core/injection/injection.dart';
+import 'package:example_flutter_app/gen/assets.gen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 
-class AppConfig {
-  static Future<void> configure() async {
-    await _initEnvKeys();
+enum Flavor { dev, prod }
+
+const flavor = String.fromEnvironment('FLAVOR');
+Flavor get flavorEnum => flavor == 'prod' ? Flavor.prod : Flavor.dev;
+
+class AppConfig implements CoreConfig {
+  @override
+  Future<void> init() async {
+    await _initEnv();
     await Future.wait([
       _initDependencies(),
       _initFirebase(),
@@ -25,7 +32,7 @@ class AppConfig {
     ]);
   }
 
-  static Future<void> _initFirebase() async {
+  Future<void> _initFirebase() async {
     await Firebase.initializeApp(options: firebaseOptions);
     await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     await FirebaseAppCheck.instance.activate();
@@ -38,15 +45,25 @@ class AppConfig {
     };
   }
 
-  static Future<void> _initEnvKeys() async {
-    await EnvKeys.loadEnv();
+  Future<void> _initEnv() async {
+    // In a real app, you would load different env files based on flavor
+    // For this template, we only have .env.example available
+    switch (flavorEnum) {
+      case Flavor.dev:
+        // await dotenv.load(fileName: Assets.env.aEnvDev);
+        await dotenv.load(fileName: Assets.env.aEnv);
+        break;
+      case Flavor.prod:
+        await dotenv.load(fileName: Assets.env.aEnv);
+        break;
+    }
   }
 
-  static Future<void> _initBloc() async {
+  Future<void> _initBloc() async {
     Bloc.observer = SimpleBlocObserver();
   }
 
-  static Future<void> _initHydratedBloc() async {
+  Future<void> _initHydratedBloc() async {
     HydratedBloc.storage = await HydratedStorage.build(
       storageDirectory: kIsWeb
           ? HydratedStorageDirectory.web
@@ -54,12 +71,13 @@ class AppConfig {
     );
   }
 
-  static Future<void> _initDependencies() async {
+  Future<void> _initDependencies() async {
     await configureDependencies();
     await getIt.allReady();
   }
 
-  static String get title {
+  @override
+  String get title {
     switch (flavorEnum) {
       case Flavor.dev:
         return 'LoyalT Dev';
@@ -68,7 +86,8 @@ class AppConfig {
     }
   }
 
-  static FirebaseOptions get firebaseOptions {
+  @override
+  FirebaseOptions get firebaseOptions {
     switch (flavorEnum) {
       case Flavor.dev:
         return dev.DefaultFirebaseOptions.currentPlatform;
@@ -76,9 +95,7 @@ class AppConfig {
         return prod.DefaultFirebaseOptions.currentPlatform;
     }
   }
+
+  @override
+  bool get isDev => flavorEnum == Flavor.dev;
 }
-
-enum Flavor { dev, prod }
-
-const flavor = String.fromEnvironment('FLAVOR');
-Flavor get flavorEnum => flavor == 'prod' ? Flavor.prod : Flavor.dev;
