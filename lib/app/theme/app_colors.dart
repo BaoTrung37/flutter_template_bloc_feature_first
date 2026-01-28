@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Color constants for the Nike theme
-class NikeColorConstants {
+/// Color constants for the App theme
+class AppColorConstants {
   static const Color primary = Color(0xFF006FFD);
   static const Color grey1Dark = Color(0xFFB0B0B0);
   static const Color grey2Dark = Color(0xFF2E2E2E);
@@ -34,8 +34,8 @@ class NikeColorConstants {
   static const Color blueLight = Color(0xffEFF3FF);
 }
 
-class NikeColors extends ThemeExtension<NikeColors> {
-  const NikeColors({
+class AppColors extends ThemeExtension<AppColors> {
+  const AppColors({
     required this.primary,
     required this.grey1,
     required this.grey2,
@@ -53,40 +53,40 @@ class NikeColors extends ThemeExtension<NikeColors> {
     required this.blue,
   });
 
-  factory NikeColors.dark() => const NikeColors(
-        primary: NikeColorConstants.primary,
-        grey1: NikeColorConstants.grey1Dark,
-        grey2: NikeColorConstants.grey2Dark,
-        grey3: NikeColorConstants.grey3Dark,
-        black: NikeColorConstants.blackDark,
-        white: NikeColorConstants.whiteDark,
-        grey: NikeColorConstants.greyDark,
-        grey5: NikeColorConstants.grey5Dark,
-        green: NikeColorConstants.greenDark,
-        greenSupport: NikeColorConstants.greenSupportDark,
-        greenSupport2: NikeColorConstants.greenSupport2Dark,
-        redSupport: NikeColorConstants.redSupportDark,
-        redSupport2: NikeColorConstants.redSupport2Dark,
-        red: NikeColorConstants.redDark,
-        blue: NikeColorConstants.blueDark,
+  factory AppColors.dark() => const AppColors(
+        primary: AppColorConstants.primary,
+        grey1: AppColorConstants.grey1Dark,
+        grey2: AppColorConstants.grey2Dark,
+        grey3: AppColorConstants.grey3Dark,
+        black: AppColorConstants.blackDark,
+        white: AppColorConstants.whiteDark,
+        grey: AppColorConstants.greyDark,
+        grey5: AppColorConstants.grey5Dark,
+        green: AppColorConstants.greenDark,
+        greenSupport: AppColorConstants.greenSupportDark,
+        greenSupport2: AppColorConstants.greenSupport2Dark,
+        redSupport: AppColorConstants.redSupportDark,
+        redSupport2: AppColorConstants.redSupport2Dark,
+        red: AppColorConstants.redDark,
+        blue: AppColorConstants.blueDark,
       );
 
-  factory NikeColors.light() => const NikeColors(
-        primary: NikeColorConstants.primary,
-        grey1: NikeColorConstants.grey1Light,
-        grey2: NikeColorConstants.grey2Light,
-        grey3: NikeColorConstants.grey3Light,
-        black: NikeColorConstants.blackLight,
-        white: NikeColorConstants.whiteLight,
-        grey: NikeColorConstants.greyLight,
-        grey5: NikeColorConstants.grey5Light,
-        green: NikeColorConstants.greenLight,
-        greenSupport: NikeColorConstants.greenSupportLight,
-        greenSupport2: NikeColorConstants.greenSupport2Light,
-        redSupport: NikeColorConstants.redSupportLight,
-        redSupport2: NikeColorConstants.redSupport2Light,
-        red: NikeColorConstants.redLight,
-        blue: NikeColorConstants.blueLight,
+  factory AppColors.light() => const AppColors(
+        primary: AppColorConstants.primary,
+        grey1: AppColorConstants.grey1Light,
+        grey2: AppColorConstants.grey2Light,
+        grey3: AppColorConstants.grey3Light,
+        black: AppColorConstants.blackLight,
+        white: AppColorConstants.whiteLight,
+        grey: AppColorConstants.greyLight,
+        grey5: AppColorConstants.grey5Light,
+        green: AppColorConstants.greenLight,
+        greenSupport: AppColorConstants.greenSupportLight,
+        greenSupport2: AppColorConstants.greenSupport2Light,
+        redSupport: AppColorConstants.redSupportLight,
+        redSupport2: AppColorConstants.redSupport2Light,
+        red: AppColorConstants.redLight,
+        blue: AppColorConstants.blueLight,
       );
 
   final Color primary;
@@ -106,7 +106,7 @@ class NikeColors extends ThemeExtension<NikeColors> {
   final Color redSupport2;
 
   @override
-  ThemeExtension<NikeColors> copyWith({
+  ThemeExtension<AppColors> copyWith({
     Color? primary,
     Color? black,
     Color? white,
@@ -123,7 +123,7 @@ class NikeColors extends ThemeExtension<NikeColors> {
     Color? blue,
     Color? redSupport2,
   }) {
-    return NikeColors(
+    return AppColors(
       primary: primary ?? this.primary,
       black: black ?? this.black,
       white: white ?? this.white,
@@ -143,15 +143,15 @@ class NikeColors extends ThemeExtension<NikeColors> {
   }
 
   @override
-  ThemeExtension<NikeColors> lerp(
-    covariant ThemeExtension<NikeColors>? other,
+  ThemeExtension<AppColors> lerp(
+    covariant ThemeExtension<AppColors>? other,
     double t,
   ) {
-    if (other == null || other is! NikeColors) {
+    if (other == null || other is! AppColors) {
       return this;
     }
 
-    return NikeColors(
+    return AppColors(
       primary: Color.lerp(primary, other.primary, t)!,
       black: Color.lerp(black, other.black, t)!,
       white: Color.lerp(white, other.white, t)!,

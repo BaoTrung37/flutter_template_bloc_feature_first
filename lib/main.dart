@@ -1,61 +1,24 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:catcher_2/catcher_2.dart';
-import 'package:example_flutter_app/core/app_config.dart';
+import 'package:example_flutter_app/app/config/app_config.dart';
+import 'package:example_flutter_app/app/theme/app_colors.dart';
+import 'package:example_flutter_app/app/theme/app_text_theme.dart';
+import 'package:example_flutter_app/app/theme/app_theme_factory.dart';
+import 'package:example_flutter_app/bootstrap.dart';
 import 'package:example_flutter_app/core/injection/injection.dart';
 import 'package:example_flutter_app/core/router/app_router.dart';
 import 'package:example_flutter_app/core/shared/languages.dart';
-import 'package:example_flutter_app/core/theme/colors.dart';
 import 'package:example_flutter_app/core/theme/providers/theme_provider.dart';
-import 'package:example_flutter_app/core/theme/texts.dart';
-import 'package:example_flutter_app/core/theme/universal_theme.dart';
 import 'package:example_flutter_app/features/language/application/bloc/language_bloc.dart';
 import 'package:example_flutter_app/gen/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-  }
-}
-
 Future<void> main() async {
-  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  HttpOverrides.global = MyHttpOverrides();
-
-  await AppConfig.configure();
-
-  final debugOptions = Catcher2Options(SilentReportMode(), [
-    ToastHandler(
-      customMessage: 'An error occurred. Please try again!',
-      textSize: 14,
-    ),
-    ConsoleHandler(),
-    // CrashlyticsHandler(),
-  ]);
-  final releaseOptions = Catcher2Options(SilentReportMode(), [
-    // CrashlyticsHandler(),
-  ]);
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
-  Catcher2(
-    rootWidget: const MyApp(),
-    debugConfig: debugOptions,
-    releaseConfig: releaseOptions,
-    navigatorKey: navigatorGlobalKey,
+  await bootstrap(
+    config: AppConfig(),
+    builder: () => const MyApp(),
   );
-
-  FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatelessWidget {
@@ -73,11 +36,11 @@ class MyApp extends StatelessWidget {
       ),
       child: ThemeProvider(
         notifier: AppTheme.uniform(
-          themeFactory: const UniversalThemeFactory(),
-          lightColors: NikeColors.light(),
-          darkColors: NikeColors.dark(),
+          themeFactory: const DefaultThemeFactory(),
+          lightColors: AppColors.light(),
+          darkColors: AppColors.dark(),
           defaultMode: ThemeMode.light,
-          textTheme: NikeTextTheme.build(),
+          textTheme: AppTextTheme.build(),
         ),
         child: BlocBuilder<LanguageBloc, LanguageState>(
           bloc: getIt<LanguageBloc>(),

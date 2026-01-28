@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class NikeTextTheme extends ThemeExtension<NikeTextTheme> {
-  const NikeTextTheme({
+class AppTextTheme extends ThemeExtension<AppTextTheme> {
+  const AppTextTheme({
     required this.extraBold24,
     required this.extraBold18,
     required this.extraBold16,
@@ -31,7 +31,7 @@ class NikeTextTheme extends ThemeExtension<NikeTextTheme> {
     required this.regular12,
   });
 
-  factory NikeTextTheme.build() => NikeTextTheme(
+  factory AppTextTheme.build() => AppTextTheme(
         extraBold24: GoogleFonts.inter(
           fontSize: 24,
           fontWeight: FontWeight.w800,
@@ -166,7 +166,7 @@ class NikeTextTheme extends ThemeExtension<NikeTextTheme> {
   final TextStyle regular12;
 
   @override
-  ThemeExtension<NikeTextTheme> copyWith({
+  ThemeExtension<AppTextTheme> copyWith({
     TextStyle? extraBold24,
     TextStyle? extraBold18,
     TextStyle? extraBold16,
@@ -194,7 +194,7 @@ class NikeTextTheme extends ThemeExtension<NikeTextTheme> {
     TextStyle? regular14,
     TextStyle? regular12,
   }) {
-    return NikeTextTheme(
+    return AppTextTheme(
       extraBold24: extraBold24 ?? this.extraBold24,
       extraBold18: extraBold18 ?? this.extraBold18,
       extraBold16: extraBold16 ?? this.extraBold16,
@@ -225,14 +225,14 @@ class NikeTextTheme extends ThemeExtension<NikeTextTheme> {
   }
 
   @override
-  ThemeExtension<NikeTextTheme> lerp(
-    covariant ThemeExtension<NikeTextTheme>? other,
+  ThemeExtension<AppTextTheme> lerp(
+    covariant ThemeExtension<AppTextTheme>? other,
     double t,
   ) {
-    if (other is! NikeTextTheme) {
+    if (other is! AppTextTheme) {
       return this;
     }
-    return NikeTextTheme(
+    return AppTextTheme(
       extraBold24: TextStyle.lerp(extraBold24, other.extraBold24, t)!,
       extraBold18: TextStyle.lerp(extraBold18, other.extraBold18, t)!,
       extraBold16: TextStyle.lerp(extraBold16, other.extraBold16, t)!,

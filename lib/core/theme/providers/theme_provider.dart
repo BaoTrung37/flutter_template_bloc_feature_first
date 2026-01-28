@@ -1,6 +1,6 @@
-import 'package:example_flutter_app/core/theme/colors.dart';
-import 'package:example_flutter_app/core/theme/providers/nike_theme.dart';
-import 'package:example_flutter_app/core/theme/texts.dart';
+import 'package:example_flutter_app/app/theme/app_colors.dart';
+import 'package:example_flutter_app/app/theme/app_text_theme.dart';
+import 'package:example_flutter_app/core/theme/providers/app_base_theme.dart';
 import 'package:example_flutter_app/core/theme/theme_data/theme_data_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,16 +48,16 @@ class AppTheme with ChangeNotifier {
   /// Allows you to define a single theme for all platforms
   /// for both light and dark mode or just one of them
   factory AppTheme.uniform({
-    required NikeTextTheme textTheme,
-    required NikeThemeDataFactory themeFactory,
+    required AppTextTheme textTheme,
+    required AppThemeDataFactory themeFactory,
     required ThemeMode defaultMode,
-    NikeColors? lightColors,
-    NikeColors? darkColors,
+    AppColors? lightColors,
+    AppColors? darkColors,
   }) {
     return AppTheme(
       mode: defaultMode,
       lightTheme: lightColors != null
-          ? NikeThemeUniform(
+          ? AppBaseThemeUniform(
               themeFactory.build(
                 colors: lightColors,
                 defaultTextStyle: textTheme,
@@ -65,7 +65,7 @@ class AppTheme with ChangeNotifier {
             )
           : null,
       darkTheme: darkColors != null
-          ? NikeThemeUniform(
+          ? AppBaseThemeUniform(
               themeFactory.build(
                 colors: darkColors,
                 defaultTextStyle: textTheme,
@@ -78,18 +78,18 @@ class AppTheme with ChangeNotifier {
   /// Allows you to define different themes for different platforms
   factory AppTheme.adaptive({
     // maybe you want to use different text themes for different platforms
-    required NikeTextTheme defaultTextTheme,
+    required AppTextTheme defaultTextTheme,
     required ThemeMode mode,
-    NikeColors? lightColors,
-    NikeColors? darkColors,
-    NikeThemeDataFactory? ios,
-    NikeThemeDataFactory? android,
-    NikeThemeDataFactory? web,
+    AppColors? lightColors,
+    AppColors? darkColors,
+    AppThemeDataFactory? ios,
+    AppThemeDataFactory? android,
+    AppThemeDataFactory? web,
   }) {
     return AppTheme(
       mode: mode,
       lightTheme: lightColors != null
-          ? NikeThemeAdaptive(
+          ? AppBaseThemeAdaptive(
               ios: ios?.build(
                 colors: lightColors,
                 defaultTextStyle: defaultTextTheme,
@@ -105,7 +105,7 @@ class AppTheme with ChangeNotifier {
             )
           : null,
       darkTheme: darkColors != null
-          ? NikeThemeAdaptive(
+          ? AppBaseThemeAdaptive(
               ios: ios?.build(
                 colors: darkColors,
                 defaultTextStyle: defaultTextTheme,
@@ -122,8 +122,8 @@ class AppTheme with ChangeNotifier {
           : null,
     );
   }
-  final NikeTheme? lightTheme;
-  final NikeTheme? darkTheme;
+  final AppBaseTheme? lightTheme;
+  final AppBaseTheme? darkTheme;
   ThemeMode mode;
 
   /// automatically toggle between light and dark mode
@@ -178,7 +178,7 @@ class AppTheme with ChangeNotifier {
 
   ThemeData get darkThemeData => darkTheme!.data.materialTheme;
 
-  NikeTheme get current {
+  AppBaseTheme get current {
     if (mode == ThemeMode.light) {
       return lightTheme!;
     } else {
