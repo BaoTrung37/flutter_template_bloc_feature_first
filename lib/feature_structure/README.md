@@ -9,10 +9,18 @@ graph TD
     P[Presentation Layer] --> A[Application Layer]
     P --> D[Domain Layer]
     A --> D
-    I[Infrastructure Layer] --> D
+    Data[Data Layer] --> D
+    Data --> I[Infrastructure Core]
     
-    subgraph Core Logic
+    subgraph Feature
+    P
+    A
     D
+    Data
+    end
+    
+    subgraph Core
+    I
     end
 ```
 
@@ -35,18 +43,30 @@ Mỗi feature được chia thành các layer rõ ràng:
     *   Chứa Entities, Value Objects, Failures.
     *   Định nghĩa Repository Interfaces (Contracts).
     
-4.  **[Infrastructure](infrastructure/infrastructure.md)**
-    *   Triển khai (Implement) Repository Interfaces.
-    *   Gọi API, Database local.
-    *   Chuyển đổi data models (DTOs).
+4.  **[Data](data/data.md)**
+    *   Quản lý dữ liệu nghiệp vụ (business data).
+    *   Repository Implementations.
+    *   Data Sources, DTOs, Mappers.
+    *   Sử dụng Infrastructure để lấy/gửi dữ liệu.
 
 5.  **[Core](core/core.md)**
     *   Các tiện ích (Utils, Extensions) dùng riêng cho feature này.
+
+## Infrastructure (Core)
+
+Infrastructure không nằm trong feature mà nằm ở `lib/core/infrastructure`:
+
+- **[Infrastructure](../../core/infrastructure/)** (Core)
+  - Công cụ kỹ thuật (HTTP client, Storage adapters).
+  - Không biết về business logic.
+  - Có thể tái sử dụng cho mọi feature.
 
 ## Luồng dữ liệu (Data Flow)
 
 1.  **UI** gửi Event -> **Application** (Bloc).
 2.  **Bloc** gọi **Domain** (UseCase/Repository Interface).
-3.  **Infrastructure** (Repository Impl) thực hiện lấy data, trả về **Entity** hoặc **Failure**.
-4.  **Bloc** nhận kết quả, emit **State** mới.
-5.  **UI** rebuild theo **State**.
+3.  **Data** (Repository Impl) sử dụng **Infrastructure** (ApiClient, Hive) để lấy data.
+4.  **Data** parse JSON -> DTO, map DTO -> **Entity**.
+5.  **Data** xử lý errors, trả về **Entity** hoặc **Failure** cho **Bloc**.
+6.  **Bloc** nhận kết quả, emit **State** mới.
+7.  **UI** rebuild theo **State**.
