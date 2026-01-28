@@ -10,7 +10,7 @@ graph TD
     P --> D[Domain Layer]
     A --> D
     Data[Data Layer] --> D
-    Data --> I[Infrastructure Core]
+    Data --> I[Infrastructure (Core)]
     
     subgraph Feature
     P
@@ -30,43 +30,41 @@ graph TD
 
 Mỗi feature được chia thành các layer rõ ràng:
 
-1.  **[Presentation](presentation/presentation.md)**
-    *   Chứa UI (Pages, Widgets).
-    *   Nhận input từ user và hiển thị data.
+1.  **[Presentation](presentation/README.md)**
+    *   Chứa UI và Logic hiển thị.
+    *   `pages`: Các màn hình (Screens).
+    *   `widgets`: Các widget tái sử dụng trong feature.
     
-2.  **[Application](application/application.md)**
+2.  **[Application](application/README.md)**
     *   State Management (Bloc/Cubit).
-    *   Điều phối logic giữa UI và Domain.
+    *   `bloc`: Quản lý trạng thái và logic nghiệp vụ UI.
     
-3.  **[Domain](domain/domain.md)**
-    *   **Lõi của Feature**.
-    *   Chứa Entities, Value Objects, Failures.
-    *   Định nghĩa Repository Interfaces (Contracts).
+3.  **[Domain](domain/README.md)**
+    *   **Lõi của Feature**. Chứa Business Logic thuần túy.
+    *   `entities`: Các object nghiệp vụ (User, Product...).
+    *   `repositories`: Interface (hợp đồng) giao tiếp dữ liệu.
+    *   `usecases`: Các kịch bản nghiệp vụ cụ thể.
     
-4.  **[Data](data/data.md)**
-    *   Quản lý dữ liệu nghiệp vụ (business data).
-    *   Repository Implementations.
-    *   Data Sources, DTOs, Mappers.
-    *   Sử dụng Infrastructure để lấy/gửi dữ liệu.
+4.  **[Data](data/README.md)**
+    *   Triển khai chi tiết việc lấy/gửi dữ liệu.
+    *   `datasources`: Nguồn dữ liệu (Remote API, Local DB).
+    *   `models`: Dữ liệu thô (DTO) để parse JSON.
+    *   `repositories`: Implementation của Repository trong Domain.
 
-5.  **[Core](core/core.md)**
+5.  **[Core](core/README.md)**
     *   Các tiện ích (Utils, Extensions) dùng riêng cho feature này.
 
-## Infrastructure (Core)
+## Infrastructure
 
-Infrastructure không nằm trong feature mà nằm ở `lib/core/infrastructure`:
-
-- **[Infrastructure](../../core/infrastructure/)** (Core)
-  - Công cụ kỹ thuật (HTTP client, Storage adapters).
-  - Không biết về business logic.
-  - Có thể tái sử dụng cho mọi feature.
+Infrastructure **không nằm trong feature** mà nằm ở `lib/core/infrastructure`. Các feature sẽ sử dụng Infrastructure thông qua Data Layer (Data Sources).
 
 ## Luồng dữ liệu (Data Flow)
 
-1.  **UI** gửi Event -> **Application** (Bloc).
-2.  **Bloc** gọi **Domain** (UseCase/Repository Interface).
-3.  **Data** (Repository Impl) sử dụng **Infrastructure** (ApiClient, Hive) để lấy data.
-4.  **Data** parse JSON -> DTO, map DTO -> **Entity**.
-5.  **Data** xử lý errors, trả về **Entity** hoặc **Failure** cho **Bloc**.
-6.  **Bloc** nhận kết quả, emit **State** mới.
-7.  **UI** rebuild theo **State**.
+1.  **UI** (Presentation) gửi Event -> **Bloc** (Application).
+2.  **Bloc** gọi **UseCase** (Domain) hoặc **Repository** (Domain).
+3.  **Repository Impl** (Data) gọi **DataSource** (Data).
+4.  **DataSource** dùng **Infrastructure** (Dio, Hive) lấy data.
+5.  **DataSource** trả về **Model** (Data), map sang **Entity** (Domain).
+6.  **Repository** trả về **Entity** hoặc **Failure** (Domain).
+7.  **Bloc** nhận kết quả, emit **State** mới.
+8.  **UI** rebuild theo **State**.
