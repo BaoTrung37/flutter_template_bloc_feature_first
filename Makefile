@@ -1,5 +1,5 @@
 ifeq ($(OS),Windows_NT)
-	COPY = copy
+	COPY = powershell -Command Copy-Item
 else 
 	COPY = cp
 endif
@@ -18,12 +18,19 @@ rebuild:
 	make gen-l10n
 	
 create-env-files:
-	@echo "Using $(COPY) command..."
-	@$(COPY) assets/env/.env.example assets/env/.env
-	@$(COPY) assets/env/.env.example assets/env/.env.dev
+ifeq ($(OS),Windows_NT)
+	@echo "Using PowerShell Copy-Item..."
+	@powershell -Command "Copy-Item -Path 'assets/env/.env.example' -Destination 'assets/env/.env'"
+	@powershell -Command "Copy-Item -Path 'assets/env/.env.example' -Destination 'assets/env/.env.dev'"
+else
+	@echo "Using cp command..."
+	@cp assets/env/.env.example assets/env/.env
+	@cp assets/env/.env.example assets/env/.env.dev
+endif
 
 clean:
 	fvm flutter clean
+	cd ios && rm -rf Pods Podfile.lock && cd ..
 
 get-dep:
 	fvm flutter pub get
