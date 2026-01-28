@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:catcher_2/catcher_2.dart';
 import 'package:example_flutter_app/core/config/core_config.dart';
-import 'package:example_flutter_app/core/network/http_overrides.dart';
+import 'package:example_flutter_app/core/infrastructure/network/overrides/http_overrides.dart';
 import 'package:example_flutter_app/core/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
