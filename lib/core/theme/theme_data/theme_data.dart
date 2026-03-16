@@ -1,5 +1,5 @@
-import 'package:example_flutter_app/app/theme/app_colors.dart';
-import 'package:example_flutter_app/app/theme/app_text_theme.dart';
+import 'package:example_flutter_app/core/theme/app_colors.dart';
+import 'package:example_flutter_app/core/theme/app_text_theme.dart';
 import 'package:flutter/material.dart';
 
 /// The first problem of Material theme is that you don't build it from a predefined set of colors
