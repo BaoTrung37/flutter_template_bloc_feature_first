@@ -20,12 +20,12 @@ rebuild:
 create-env-files:
 ifeq ($(OS),Windows_NT)
 	@echo "Using PowerShell Copy-Item..."
-	@powershell -Command "Copy-Item -Path 'assets/env/.env.example' -Destination 'assets/env/.env'"
-	@powershell -Command "Copy-Item -Path 'assets/env/.env.example' -Destination 'assets/env/.env.dev'"
+	@powershell -Command "Copy-Item -Path 'assets/environments/.env.example' -Destination 'assets/environments/.env'"
+	@powershell -Command "Copy-Item -Path 'assets/environments/.env.example' -Destination 'assets/environments/.env.dev'"
 else
 	@echo "Using cp command..."
-	@cp assets/env/.env.example assets/env/.env
-	@cp assets/env/.env.example assets/env/.env.dev
+	@cp assets/environments/.env.example assets/environments/.env
+	@cp assets/environments/.env.example assets/environments/.env.dev
 endif
 
 clean:
@@ -74,4 +74,13 @@ build-ipa-dev:
 build-ipa-prod:
 	fvm flutter build ipa --flavor prod -t lib/main.dart --dart-define=FLAVOR=prod
 
+enable-auto-signing:
+	@git update-index --skip-worktree ios/Runner.xcodeproj/project.pbxproj
+	@echo "✅ Signing changes are now ignored by git."
+	@echo "👉 Open Xcode → Signing & Capabilities → Enable 'Automatically manage signing' → Select your Team."
+
+disable-auto-signing:
+	@git update-index --no-skip-worktree ios/Runner.xcodeproj/project.pbxproj
+	@git checkout ios/Runner.xcodeproj/project.pbxproj
+	@echo "✅ Restored to manual signing from git."
 
