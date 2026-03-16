@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:example_flutter_app/core/presentation/extensions/buildcontext_extension.dart';
+import 'package:example_flutter_app/core/utils/extensions/buildcontext_extension.dart';
 import 'package:flutter/material.dart';
 
 @RoutePage()

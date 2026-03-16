@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:example_flutter_app/core/presentation/extensions/buildcontext_extension.dart';
-import 'package:example_flutter_app/features/main_page/application/bottom_tab_cubit.dart';
+import 'package:example_flutter_app/core/utils/extensions/buildcontext_extension.dart';
+import 'package:example_flutter_app/features/main_page/presentation/cubit/bottom_tab_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

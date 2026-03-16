@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:example_flutter_app/core/injection/injection.dart';
+import 'package:example_flutter_app/core/di/injection.dart';
 import 'package:example_flutter_app/core/router/app_router.dart';
-import 'package:example_flutter_app/features/main_page/application/bottom_tab_cubit.dart';
+import 'package:example_flutter_app/features/main_page/presentation/cubit/bottom_tab_cubit.dart';
 import 'package:example_flutter_app/features/main_page/presentation/widgets/main_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,14 +13,9 @@ class MainPage extends StatelessWidget implements AutoRouteWrapper {
   @override
   Widget build(BuildContext context) {
     return AutoTabsRouter(
-      routes: const [
-        HomeRoute(),
-        ProfileRoute(),
-      ],
-      transitionBuilder: (context, child, animation) => FadeTransition(
-        opacity: animation,
-        child: child,
-      ),
+      routes: const [HomeRoute(), ProfileRoute()],
+      transitionBuilder: (context, child, animation) =>
+          FadeTransition(opacity: animation, child: child),
       builder: (context, child) {
         final tabsRouter = AutoTabsRouter.of(context);
 

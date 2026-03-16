@@ -1,5 +1,5 @@
-import 'package:example_flutter_app/app/theme/app_colors.dart';
-import 'package:example_flutter_app/app/theme/app_text_theme.dart';
+import 'package:example_flutter_app/core/theme/app_colors.dart';
+import 'package:example_flutter_app/core/theme/app_text_theme.dart';
 import 'package:example_flutter_app/core/theme/providers/app_base_theme.dart';
 import 'package:example_flutter_app/core/theme/theme_data/theme_data_factory.dart';
 import 'package:flutter/material.dart';
