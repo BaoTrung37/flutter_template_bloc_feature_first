@@ -1,0 +1,279 @@
+name: 🚀 iOS Internal Release
+
+on:
+  push:
+    tags:
+      - "ios-dev*"
+      - "ios-prod*"
+      - "v*"
+
+concurrency:
+  group: ios-internal-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect_context:
+    name: 🧭 Detect Build Context
+    runs-on: ubuntu-latest
+    outputs:
+      env_name: ${{ steps.detect.outputs.env_name }}
+      flavor: ${{ steps.detect.outputs.flavor }}
+      version: ${{ steps.detect.outputs.version }}
+    steps:
+      - name: 🧩 Resolve environment and flavor
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          REF_NAME="${GITHUB_REF#refs/tags/}"
+          if [[ "$REF_NAME" == dev* || "$REF_NAME" == ios-dev* ]]; then
+            ENV_NAME="dev"
+          else
+            ENV_NAME="prod"
+          fi
+
+          VERSION=$(echo "$REF_NAME" | sed 's/^[a-zA-Z-]*//')
+          if [[ -z "$VERSION" || "$VERSION" == "$REF_NAME" ]]; then
+            VERSION="1.0.${GITHUB_RUN_NUMBER}"
+          fi
+
+          {
+            echo "env_name=$ENV_NAME"
+            echo "flavor=$ENV_NAME"
+            echo "version=$VERSION"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Environment: $ENV_NAME"
+          echo "Flavor: $ENV_NAME"
+          echo "Version: $VERSION"
+
+  ios_release:
+    name: 🍏 Build and Upload IPA
+    needs: detect_context
+    runs-on: macos-latest
+    permissions: write-all
+
+    # TODO: enable this when we have separate environments for dev and prod
+    # environment: ${{ needs.detect_context.outputs.env_name }}
+    env:
+      FLAVOR: ${{ needs.detect_context.outputs.flavor }}
+      APP_ENV: ${{ needs.detect_context.outputs.env_name }}
+      APP_VERSION: ${{ needs.detect_context.outputs.version }}
+      BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID }}
+      FLUTTER_VERSION: 3.35.2
+      APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+      APPSTORE_ISSUER_ID: ${{ vars.APPSTORE_ISSUER_ID }}
+      APPSTORE_API_KEY_ID: ${{ vars.APPSTORE_API_KEY_ID }}
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ✅ Preflight checks (required vars and secrets)
+        env:
+          APPLE_CERTIFICATE_P12_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          APPSTORE_KEY_P8_BASE64: ${{ secrets.APPSTORE_KEY_P8_BASE64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          : "${APPLE_TEAM_ID:?Missing variable APPLE_TEAM_ID}"
+          : "${APPSTORE_ISSUER_ID:?Missing variable APPSTORE_ISSUER_ID}"
+          : "${APPSTORE_API_KEY_ID:?Missing variable APPSTORE_API_KEY_ID}"
+          : "${BUNDLE_ID:?Missing variable IOS_BUNDLE_ID}"
+
+          : "${APPLE_CERTIFICATE_P12_BASE64:?Missing secret APPLE_CERTIFICATE_P12_BASE64}"
+          : "${APPLE_CERTIFICATE_PASSWORD:?Missing secret APPLE_CERTIFICATE_PASSWORD}"
+          : "${APPLE_PROVISIONING_PROFILE_BASE64:?Missing secret APPLE_PROVISIONING_PROFILE_BASE64}"
+          : "${KEYCHAIN_PASSWORD:?Missing secret KEYCHAIN_PASSWORD}"
+          : "${APPSTORE_KEY_P8_BASE64:?Missing secret APPSTORE_KEY_P8_BASE64}"
+
+      - name: 🦋 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: 🔥 Install FlutterFire CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          dart pub global activate flutterfire_cli
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+          flutterfire --version
+
+      - name: 🛠 Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest
+
+      - name: ⚡ Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
+
+      - name: 📦 Install Flutter dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter --version
+          flutter clean
+          flutter pub get
+          flutter pub run build_runner build --delete-conflicting-outputs
+          flutter gen-l10n --no-nullable-getter
+
+      - name: ⚡ Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile', 'pubspec.lock') }}
+
+      - name: 🧱 Install CocoaPods
+        working-directory: ios
+        shell: bash
+        run: |
+          set -euo pipefail
+          pod deintegrate
+          rm -f Podfile.lock
+          pod install --repo-update
+
+      - name: 🔐 Install certificate and provisioning profile
+        env:
+          APPLE_CERTIFICATE_P12_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CERT_PATH="$RUNNER_TEMP/cert.p12"
+          PROFILE_PATH="$RUNNER_TEMP/profile.mobileprovision"
+          PROFILE_PLIST_PATH="$RUNNER_TEMP/profile.plist"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+
+          echo -n "$APPLE_CERTIFICATE_P12_BASE64" | base64 --decode -o "$CERT_PATH"
+          echo -n "$APPLE_PROVISIONING_PROFILE_BASE64" | base64 --decode -o "$PROFILE_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERT_PATH" -P "$APPLE_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH"
+          security default-keychain -s "$KEYCHAIN_PATH"
+
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          security cms -D -i "$PROFILE_PATH" > "$PROFILE_PLIST_PATH"
+
+          PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" "$PROFILE_PLIST_PATH")
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" "$PROFILE_PLIST_PATH")
+
+          cp "$PROFILE_PATH" "$HOME/Library/MobileDevice/Provisioning Profiles/$PROFILE_UUID.mobileprovision"
+
+          {
+            echo "PROFILE_NAME=$PROFILE_NAME"
+            echo "PROFILE_UUID=$PROFILE_UUID"
+          } >> "$GITHUB_ENV"
+
+          security find-identity -v -p codesigning
+
+      - name: 🧾 Configure Xcode signing for CI
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sed -i '' "s/DEVELOPMENT_TEAM = \"\";/DEVELOPMENT_TEAM = $APPLE_TEAM_ID;/g" ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' "s/CODE_SIGN_IDENTITY = \"Apple Development\";/CODE_SIGN_IDENTITY = \"Apple Distribution\";/g" ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' "s/\"CODE_SIGN_IDENTITY\\[sdk=iphoneos\\*\\]\" = \"iPhone Developer\";/\"CODE_SIGN_IDENTITY[sdk=iphoneos*]\" = \"Apple Distribution\";/g" ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = \"\";/PROVISIONING_PROFILE_SPECIFIER = \"$PROFILE_NAME\";/g" ios/Runner.xcodeproj/project.pbxproj
+
+          cat > ios/ExportOptions.ci.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>teamID</key>
+            <string>$APPLE_TEAM_ID</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>$BUNDLE_ID</key>
+              <string>$PROFILE_NAME</string>
+            </dict>
+            <key>compileBitcode</key>
+            <false/>
+          </dict>
+          </plist>
+          EOF
+
+      - name: 🏗 Build IPA
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter build ipa \
+            --release \
+            --flavor "$FLAVOR" \
+            -t lib/main.dart \
+            --dart-define=FLAVOR="$APP_ENV" \
+            --export-options-plist=ios/ExportOptions.ci.plist
+
+      - name: 🔎 Resolve IPA artifact
+        id: resolve_ipa
+        shell: bash
+        run: |
+          set -euo pipefail
+          IPA_PATH="$(find build/ios -type f -name "*.ipa" | sort | head -n 1)"
+
+          if [[ -z "$IPA_PATH" ]]; then
+            echo "No IPA file found after build."
+            echo "Listing build/ios for debugging:"
+            find build/ios -maxdepth 4 -type f | sort || true
+            exit 1
+          fi
+
+          echo "Resolved IPA: $IPA_PATH"
+          echo "ipa_path=$IPA_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: 🔑 Prepare App Store API key
+        id: appstore_key
+        env:
+          APPSTORE_KEY_P8_BASE64: ${{ secrets.APPSTORE_KEY_P8_BASE64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$HOME/private_keys"
+          APPSTORE_PRIVATE_KEY=$(echo -n "$APPSTORE_KEY_P8_BASE64" | base64 --decode)
+          echo "$APPSTORE_PRIVATE_KEY" > "$HOME/private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8"
+
+          {
+            echo "appstore_private_key<<EOF"
+            echo "$APPSTORE_PRIVATE_KEY"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: 🚀 Upload to TestFlight
+        uses: apple-actions/upload-testflight-build@v3
+        with:
+          app-path: ${{ steps.resolve_ipa.outputs.ipa_path }}
+          issuer-id: ${{ env.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ env.APPSTORE_API_KEY_ID }}
+          api-private-key: ${{ steps.appstore_key.outputs.appstore_private_key }}
+
+      - name: 🧹 Cleanup signing artifacts
+        if: always()
+        shell: bash
+        run: |
+          security delete-keychain "$RUNNER_TEMP/app-signing.keychain-db" || true
+          rm -rf "$HOME/private_keys" || true
+          rm -rf "$HOME/Library/MobileDevice/Provisioning Profiles"/*.mobileprovision || true
