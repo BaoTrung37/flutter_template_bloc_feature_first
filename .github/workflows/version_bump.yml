@@ -1,0 +1,133 @@
+name: Bump Version in pubspec
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Target branch"
+        required: true
+        default: "main"
+      bump_version:
+        description: "Auto bump pubspec version and commit"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      create_tag:
+        description: "Create and push git tag"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      tag_name:
+        description: "Optional tag name (empty => auto from version)"
+        required: false
+        default: ""
+
+concurrency:
+  group: bump-version-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_branch }}
+          fetch-depth: 0
+
+      - name: Auto bump version in pubspec.yaml
+        id: bump_version
+        if: inputs.bump_version == 'true'
+        run: |
+          set -euo pipefail
+
+          current_version="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -n1)"
+          if [[ -z "${current_version}" ]]; then
+            echo "Cannot find version in pubspec.yaml"
+            exit 1
+          fi
+
+          if [[ "${current_version}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)\+([0-9]+)$ ]]; then
+            version_name="${BASH_REMATCH[1]}"
+            current_build="${BASH_REMATCH[2]}"
+          else
+            echo "Invalid pubspec version format: ${current_version}"
+            echo "Expected format: x.y.z+buildNumber"
+            exit 1
+          fi
+
+          run_build="${GITHUB_RUN_NUMBER}"
+          if (( run_build > current_build )); then
+            next_build="${run_build}"
+          else
+            next_build="$((current_build + 1))"
+          fi
+
+          next_version="${version_name}+${next_build}"
+          sed -i "s/^version:.*/version: ${next_version}/" pubspec.yaml
+
+          echo "Bumped version: ${current_version} -> ${next_version}"
+          echo "full_version=${next_version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Configure git user
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push bumped version
+        if: inputs.bump_version == 'true'
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet -- pubspec.yaml; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add pubspec.yaml
+          git commit -m "ci: bump app version to ${{ steps.bump_version.outputs.full_version }} [skip ci]"
+          git push origin "HEAD:${{ inputs.target_branch }}"
+
+      - name: Resolve tag name
+        id: resolve_tag
+        if: inputs.create_tag == 'true'
+        run: |
+          set -euo pipefail
+
+          tag_name="${{ inputs.tag_name }}"
+          if [[ -z "${tag_name}" ]]; then
+            if [[ "${{ inputs.bump_version }}" == "true" ]]; then
+              tag_name="v${{ steps.bump_version.outputs.full_version }}"
+            else
+              echo "tag_name is required when create_tag=true and bump_version=false"
+              exit 1
+            fi
+          fi
+
+          echo "tag_name=${tag_name}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create and push tag
+        if: inputs.create_tag == 'true'
+        run: |
+          set -euo pipefail
+          tag_name="${{ steps.resolve_tag.outputs.tag_name }}"
+
+          if git rev-parse "${tag_name}" >/dev/null 2>&1; then
+            echo "Tag already exists: ${tag_name}"
+            exit 1
+          fi
+
+          git tag "${tag_name}"
+          git push origin "${tag_name}"
